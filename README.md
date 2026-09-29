@@ -68,10 +68,9 @@ During these meetings, the team discusses project progress, divides responsibili
 
 The team is currently working on:
 
-- Finalizing the Software Requirements Specification.
+- Finalizing and creating a mockup design.
 - Refining functional and non-functional requirements.
-- Preparing project presentation materials.
-- Reviewing the network traffic analysis architecture.
+- Setting up dataset
 - Planning implementation of anomaly detection, visualization, filtering, and AI-assistant functionality.
 - Reviewing team deliverables before submission.
 
