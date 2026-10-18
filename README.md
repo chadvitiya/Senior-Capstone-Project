@@ -1,6 +1,7 @@
-# Senior-Capstone-Project
-Traffic Network Data Analysis Project
+
 # 443 Guardians — Senior Capstone Project
+
+## Traffic Network Data Analysis Project
 
 ## Project Overview
 
@@ -14,11 +15,11 @@ The project includes network traffic processing, anomaly detection, visualizatio
 
 | Group Member | Role / Contribution |
 |---|---|
-| **Emilio Zavala** | Project Overview, Project Description, and Definitions/Acronyms |
-| **Benjamin Ratcliff** | Project Plan |
-| **Advitiya Gaikwad** | Software Requirements Specification (SRS) |
-| **Carter Lafrenz** | Functional Requirements |
-| **Shravani Koli** | Presentation Slides |
+| **Emilio Zavala** | UML Class Diagram |
+| **Benjamin Ratcliff** | Implementation Plan |
+| **Advitiya Gaikwad** | UML Use Case Diagram and Sequence Diagram |
+| **Carter Lafrenz** | Prototype Design |
+| **Shravani Koli** | Presentation Slides and Project Report |
 
 ### Emilio Zavala
 Department of Computer Science  
@@ -43,46 +44,38 @@ Lubbock, TX
 ### Shravani Koli
 Department of Computer Science  
 Texas Tech University  
-Lubbock, TX 
+Lubbock, TX  
 
 ---
 
 ## Group Meetings and Activities
 
-The group meets every **Thursday after class at approximately 3:30 PM** for about **1.5 hours**.
+The group meets regularly to discuss project progress, review completed work, divide responsibilities, and plan upcoming tasks.
 
-During these meetings, the team discusses project progress, divides responsibilities, reviews completed work, and plans upcoming tasks.
+### Meeting Summary
 
-### Recent Meetings
+The team has held **6 group meetings** so far, focusing on:
 
-| Meeting | Schedule | Activities |
-|---|---|---|
-| **Meeting 1** | Thursday, approximately 3:30 PM – 5:00 PM | Discussed project direction, divided report responsibilities, reviewed project requirements, and assigned sections to group members. |
-| **Meeting 2** | Thursday, approximately 3:30 PM – 5:00 PM | Reviewed completed SRS sections, functional requirements, project plan, project description, and presentation slides. Discussed revisions and preparation for submission. |
-
-**Total meetings during the last two weeks: 2**
+- Discussing project objectives, scope, and requirements.
+- Reviewing project documentation and system architecture.
+- Planning and reviewing UML diagrams and prototype designs.
+- Discussing implementation strategies and development tasks.
+- Preparing project reports and presentations.
 
 ---
 
 ## Current Activities
 
-The team is currently working on:
-
-- Finalizing and creating a mockup design.
-- Refining functional and non-functional requirements.
-- Setting up dataset
-- Planning implementation of anomaly detection, visualization, filtering, and AI-assistant functionality.
-- Reviewing team deliverables before submission.
+- Finalizing UML diagrams and prototype design.
+- Reviewing the implementation plan.
+- Preparing for frontend and backend development.
+- Completing Stage 2 documentation and presentation.
 
 ---
 
 ## Upcoming Schedule
 
-| Schedule | Planned Activity |
-|---|---|
-| **Next Thursday, 3:30 PM – 5:00 PM** | Review project progress and finalize any remaining documentation updates. |
-| **Following Thursday, 3:30 PM – 5:00 PM** | Review implementation progress, discuss issues, and assign upcoming development tasks. |
-| **Weekly thereafter** | Continue development, testing, documentation, and preparation for project milestones. |
+The team will continue meeting regularly to review project progress, coordinate development tasks, address implementation challenges, and prepare for upcoming project milestones.
 
 ---
 
@@ -91,12 +84,26 @@ The team is currently working on:
 The project is expected to include the following major components:
 
 - **Detection System** — Classifies TCP connection behavior and identifies anomalies.
-- **API Layer** — Provides network and anomaly data to the frontend and AI assistant.
+- **Data Processing Pipeline** — Processes packet capture files and generates connection statistics stored in SQLite.
+- **API Layer** — Uses Python and FastAPI to provide network and anomaly data to the frontend and AI assistant.
 - **Interactive Timeline** — Displays network activity over time.
 - **Anomaly Dashboard** — Displays and prioritizes detected anomalies.
 - **Filtering and Search** — Allows users to investigate traffic using IP addresses, ports, time, severity, TCP flags, and anomaly types.
 - **Event Detail View** — Displays detailed information for selected network events.
-- **AI Assistant** — Answers questions about selected network traffic and helps explain detected anomalies.
+- **AI Assistant** — Uses Claude through the backend to answer questions about selected network traffic and explain detected anomalies.
+
+---
+
+## Technology Stack
+
+| Component | Technology |
+|---|---|
+| Frontend | React, TypeScript, Vite |
+| Backend | Python, FastAPI |
+| Database | SQLite |
+| Data Processing | Python |
+| AI Assistant | Claude API |
+| Development Environment | Local Development and Testing |
 
 ---
 
