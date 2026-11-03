@@ -1,7 +1,15 @@
+import Sparkline from './Sparkline'
+
 export default function StatCards() {
   return (
-    <div className="border border-dashed border-stone-400 rounded p-3 text-sm text-stone-500">
-      StatCards
+    <div className="grid grid-cols-4 gap-3">
+      <div className="bg-panel border border-line rounded p-4">Total anomalies</div>
+      <div className="bg-panel border border-line rounded p-4">High severity</div>
+      <div className="bg-panel border border-line rounded p-4">Hosts flagged</div>
+      <div className="bg-panel border border-line rounded p-4">
+        Anomalies over time
+        <Sparkline />
+      </div>
     </div>
   )
 }
