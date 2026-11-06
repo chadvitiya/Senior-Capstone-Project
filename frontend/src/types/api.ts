@@ -34,3 +34,46 @@ export interface AnomaliesResponse {
   offset: number
   items: Anomaly[]
 }
+
+export interface AnomalyPair {
+  initiator: string
+  responder: string
+  count: number
+  close_type: string | null
+  dst_port: number | null
+  sourceHost: string | null
+  destHost: string | null
+}
+
+export interface AnomalyDetail extends Anomaly {
+  pairs: AnomalyPair[]
+  pairsTruncated: boolean
+}
+
+export interface TcpFlagCounts {
+  SYN: number
+  SYNACK: number
+  FIN: number
+  RST: number
+}
+
+export interface InvestigationConnection {
+  id: string
+  sourceHost: string | null
+  destHost: string | null
+  time: string | null
+  closeType: string | null
+  sourcePort: number
+  destPort: number
+  packets: number
+  bytes: number
+  tcpFlags: TcpFlagCounts
+}
+
+export interface InvestigationResponse {
+  overview: TimelinePoint[]
+  connections: InvestigationConnection[]
+  suggestedHosts: string[]
+  limit: number
+  connectionCloseTypesAvailable: boolean
+}

@@ -1,5 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { api } from '../api/client'
+import type { AnomalyDetail, InvestigationResponse } from '../types/api'
+import { useInvestigation } from '../store/investigationStore'
 import EmptyInvestigation from '../components/investigation/EmptyInvestigation'
 import InvestigationHeader from '../components/investigation/InvestigationHeader'
 import OverviewStrip from '../components/investigation/OverviewStrip'
@@ -10,15 +13,97 @@ import StepTrail from '../components/investigation/StepTrail'
 import AIDrawer from '../components/chat/AIDrawer'
 
 export default function InvestigationPage() {
+  // URL and page state
   const { anomalyId } = useParams()
   const [aiOpen, setAiOpen] = useState(false)
+  const [anomaly, setAnomaly] = useState<AnomalyDetail | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
+  // Shared store
+  const start = useInvestigation((s) => s.start)
+  const hosts = useInvestigation((s) => s.hosts)
+  const eventTime = useInvestigation((s) => s.eventTime)
+  const windowSize = useInvestigation((s) => s.windowSize)
+
+  // Data from the server
+  const [investigation, setInvestigation] = useState<InvestigationResponse | null>(null)
+
+  // Load the anomaly and start the investigation
+  useEffect(() => {
+    if (!anomalyId) return
+    const controller = new AbortController()
+
+    api.anomaly(anomalyId, controller.signal)
+      .then((data) => {
+        setAnomaly(data)
+
+        const startHosts: string[] = []
+        if (data.sourceHost) startHosts.push(data.sourceHost)
+        if (data.destHost && data.destHost !== data.sourceHost) startHosts.push(data.destHost)
+
+        const eventSeconds = data.time ? Date.parse(data.time) / 1000 : 0
+        start(startHosts, eventSeconds)
+      })
+      .catch((err: unknown) => {
+        if (!controller.signal.aborted) {
+          setError(err instanceof Error ? err.message : 'Unable to load anomaly')
+        }
+      })
+
+    return () => controller.abort()
+  }, [anomalyId, start])
+
+  // Load connections when hosts or the window change
+  useEffect(() => {
+    if (hosts.length === 0) return
+    const controller = new AbortController()
+
+    api.investigation(hosts, eventTime - windowSize, eventTime + windowSize, controller.signal)
+      .then((data) => setInvestigation(data))
+      .catch((err: unknown) => {
+        if (!controller.signal.aborted) {
+          setError(err instanceof Error ? err.message : 'Unable to load connections')
+        }
+      })
+
+    return () => controller.abort()
+  }, [hosts, eventTime, windowSize])
+
+  // Early returns
   if (!anomalyId) return <EmptyInvestigation />
+
+  if (error) {
+    return (
+      <div role="alert" className="m-6 rounded border border-reset bg-panel p-4">
+        <p className="font-semibold">Couldn't load {anomalyId}</p>
+        <p className="text-sm mt-1">{error}</p>
+      </div>
+    )
+  }
+
+  if (!anomaly) {
+    return <p role="status" className="m-6 text-muted">Loading investigation…</p>
+  }
+
+  if (hosts.length === 0) {
+    return (
+      <div className="m-6 rounded border border-line bg-panel p-4">
+        <p className="font-semibold">No hosts to investigate for {anomaly.id}</p>
+        <p className="text-sm mt-1 text-muted">
+          The detector didn't record a source or destination host for this anomaly.
+        </p>
+      </div>
+    )
+  }
+
+  // Render
+  const title = `${anomaly.sourceHost ?? anomaly.id} · ${anomaly.type.replaceAll('_', ' ')}`
+  console.log('hosts:', hosts.join(', '), '| eventTime:', eventTime, '| connections:', investigation?.connections.length) // temporary check, delete after step 3
 
   return (
     <div className="min-h-screen flex flex-col">
       <InvestigationHeader
-        title={`Investigation: ${anomalyId}`}
+        title={title}
         aiOpen={aiOpen}
         onToggleAI={() => setAiOpen(!aiOpen)}
       />
@@ -31,7 +116,7 @@ export default function InvestigationPage() {
             <TimeWindowControls />
             <TimelineLegend />
           </div>
-          <HostTimeline />
+          <HostTimeline connections={investigation?.connections ?? []} />
           <StepTrail />
         </div>
 
