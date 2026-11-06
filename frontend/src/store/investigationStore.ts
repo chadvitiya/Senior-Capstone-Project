@@ -24,7 +24,9 @@ export const useInvestigation = create<InvestigationState>()((set) => ({
     set({ hosts, eventTime, windowSize: 60, selectedConnectionId: null }),
 
   addHost: (id) =>
-    set((state) => (state.hosts.includes(id) ? state : { hosts: [...state.hosts, id] })),
+    set((state) =>
+        state.hosts.includes(id) || state.hosts.length >= 20 ? state : { hosts: [...state.hosts, id] }
+    ),
 
   removeHost: (id) =>
     set((state) => ({ hosts: state.hosts.filter((h) => h !== id) })),

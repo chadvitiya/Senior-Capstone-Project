@@ -116,6 +116,11 @@ export default function InvestigationPage() {
             <TimeWindowControls />
             <TimelineLegend />
           </div>
+          {investigation && investigation.connections.length === investigation.limit && (
+            <p className="text-xs text-reset">
+              Showing the first {investigation.limit} connections. Narrow the time window to see the rest.
+            </p>
+          )}
           <HostTimeline connections={investigation?.connections ?? []} />
           <StepTrail />
         </div>
