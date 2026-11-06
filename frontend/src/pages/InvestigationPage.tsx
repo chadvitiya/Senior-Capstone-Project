@@ -11,6 +11,7 @@ import TimelineLegend from '../components/investigation/TimelineLegend'
 import HostTimeline from '../components/investigation/HostTimeline'
 import StepTrail from '../components/investigation/StepTrail'
 import AIDrawer from '../components/chat/AIDrawer'
+import EventDetailModal from '../components/detail/EventDetailModal'
 
 export default function InvestigationPage() {
   // URL and page state
@@ -24,6 +25,9 @@ export default function InvestigationPage() {
   const hosts = useInvestigation((s) => s.hosts)
   const eventTime = useInvestigation((s) => s.eventTime)
   const windowSize = useInvestigation((s) => s.windowSize)
+  const selectedConnectionId = useInvestigation((s) => s.selectedConnectionId)
+  const selectConnection = useInvestigation((s) => s.selectConnection)
+  const [loadingConnections, setLoadingConnections] = useState(false)
 
   // Data from the server
   const [investigation, setInvestigation] = useState<InvestigationResponse | null>(null)
@@ -58,16 +62,19 @@ export default function InvestigationPage() {
     if (hosts.length === 0) return
     const controller = new AbortController()
 
+    setLoadingConnections(true)
+    setError(null)
     api.investigation(hosts, eventTime - windowSize, eventTime + windowSize, controller.signal)
-      .then((data) => setInvestigation(data))
+      .then((data) => { setInvestigation(data); selectConnection(null) })
       .catch((err: unknown) => {
         if (!controller.signal.aborted) {
           setError(err instanceof Error ? err.message : 'Unable to load connections')
         }
       })
+      .finally(() => { if (!controller.signal.aborted) setLoadingConnections(false) })
 
     return () => controller.abort()
-  }, [hosts, eventTime, windowSize])
+  }, [hosts, eventTime, windowSize, selectConnection])
 
   // Early returns
   if (!anomalyId) return <EmptyInvestigation />
@@ -98,7 +105,7 @@ export default function InvestigationPage() {
 
   // Render
   const title = `${anomaly.sourceHost ?? anomaly.id} · ${anomaly.type.replaceAll('_', ' ')}`
-  console.log('hosts:', hosts.join(', '), '| eventTime:', eventTime, '| connections:', investigation?.connections.length) // temporary check, delete after step 3
+  const selectedConnection = investigation?.connections.find((c) => c.id === selectedConnectionId)
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -111,7 +118,7 @@ export default function InvestigationPage() {
       <div className="flex-1 flex gap-4 px-6 py-5">
         {/* Left: timeline column */}
         <div className="flex-1 min-w-0 flex flex-col gap-4">
-          <OverviewStrip />
+          <OverviewStrip anomaly={anomaly} connections={investigation?.connections ?? []} hostCount={hosts.length} loading={loadingConnections} truncated={Boolean(investigation && investigation.connections.length >= investigation.limit)} />
           <div className="flex justify-between items-center">
             <TimeWindowControls />
             <TimelineLegend />
@@ -121,14 +128,17 @@ export default function InvestigationPage() {
               Showing the first {investigation.limit} connections. Narrow the time window to see the rest.
             </p>
           )}
+          {loadingConnections && <p role="status" className="text-xs text-muted">Loading connections…</p>}
+          {!loadingConnections && investigation?.connections.length === 0 && <p className="text-sm text-muted">No flows found in this time window. Try expanding the window or selecting another anomaly.</p>}
           <HostTimeline connections={investigation?.connections ?? []} />
+          {selectedConnection && <EventDetailModal connection={selectedConnection} connections={investigation?.connections ?? []} onClose={() => selectConnection(null)} />}
           <StepTrail />
         </div>
 
         {/* Right: AI drawer, only when open */}
         {aiOpen && (
           <div className="w-96 shrink-0">
-            <AIDrawer />
+            <AIDrawer key={anomalyId} anomalyId={anomalyId} />
           </div>
         )}
       </div>
