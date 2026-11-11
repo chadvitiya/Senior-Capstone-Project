@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
 import { api } from '../api/client'
 import type { AnomalyDetail, InvestigationResponse } from '../types/api'
 import { useInvestigation } from '../store/investigationStore'
@@ -16,7 +16,8 @@ import EventDetailModal from '../components/detail/EventDetailModal'
 export default function InvestigationPage() {
   // URL and page state
   const { anomalyId } = useParams()
-  const [aiOpen, setAiOpen] = useState(false)
+  const [searchParams] = useSearchParams()
+  const [aiOpen, setAiOpen] = useState(searchParams.get('ai') === '1')
   const [anomaly, setAnomaly] = useState<AnomalyDetail | null>(null)
   const [error, setError] = useState<string | null>(null)
 
