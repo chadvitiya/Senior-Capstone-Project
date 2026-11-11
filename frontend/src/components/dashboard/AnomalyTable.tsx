@@ -18,7 +18,7 @@ export default function AnomalyTable({ items }: { items: Anomaly[] }) {
         <td className="px-3 py-3" title={a.sourceIp ?? ''}>{a.sourceHost ?? a.sourceIp ?? '—'}</td>
         <td className="px-3 py-3" title={a.destIp ?? ''}>{a.destHost ?? a.destIp ?? '—'}</td>
         <td className="px-3 py-3">{a.count.toLocaleString()}</td>
-        <td className="px-3 py-3"><Link to={`/investigation/${encodeURIComponent(a.id)}`} className="inline-block rounded bg-accent px-3 py-1.5 text-white hover:opacity-85">Investigate</Link></td>
+        <td className="px-3 py-3"><Link to={`/anomaly/${encodeURIComponent(a.id)}`} className="inline-block rounded bg-accent px-3 py-1.5 text-white hover:opacity-85">Investigate</Link></td>
       </tr>)}</tbody>
     </table>
   </div>
