@@ -144,6 +144,27 @@ function MessageMarkdown({ text }: { text: string }) {
   )
 }
 
+function HostButtons({ text }: { text: string }) {
+  const hosts = useInvestigation(s => s.hosts)
+  const addHost = useInvestigation(s => s.addHost)
+  const found = [...new Set(text.match(/H-\d{6}/g) ?? [])]
+  if (found.length === 0) return null
+
+  return (
+    <div className="mt-3 flex flex-wrap gap-2">
+      {found.map(id => {
+        const onTimeline = hosts.includes(id)
+        return (
+          <button key={id} type="button" disabled={onTimeline} onClick={() => addHost(id)}
+            className="rounded-lg border border-[#5e7a4f] px-2 py-1 text-xs text-[#5e7a4f] hover:bg-white disabled:opacity-50">
+            {onTimeline ? `✓ ${id} on timeline` : `+ Add ${id}`}
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
 export default function AIDrawer({
   anomalyId,
 }: {
@@ -288,6 +309,7 @@ export default function AIDrawer({
             ) : (
               <div className="max-w-[96%] rounded-2xl rounded-tl-md bg-[#efe8dd] px-4 py-3 text-sm text-[#453d34] shadow-sm">
                 <MessageMarkdown text={m.text} />
+                <HostButtons text={m.text} />
               </div>
             )}
           </div>

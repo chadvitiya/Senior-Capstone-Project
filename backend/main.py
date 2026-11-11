@@ -30,14 +30,21 @@ def obj(text, default=None):
     except (ValueError, TypeError):
         return default
 
+def to_score(confidence):
+    c = float(confidence or 0)
+    return round(max(0, min(100, c * 100 if c <= 1 else c)), 1)
+
+def to_severity(score):
+    return min(5, int(score // 20) + 1)
+
 def anomaly(row, ids, pair=None):
     pair = pair or {}
     initiator, responder = pair.get('initiator'), pair.get('responder') or row['responder']
     evidence = obj(row['evidence'], row['evidence'])
     return {
         'id': f"A-{row['region_id']}",
-        'score': round(max(0, min(100, float(row['confidence'] or 0) * (100 if float(row['confidence'] or 0) <= 1 else 1))), 1),
-        'severity': None,
+        'score': to_score(row['confidence']),
+        'severity': to_severity(to_score(row['confidence'])),
         'time': iso(row['t_min']),
         'endTime': iso(row['t_max']),
         'sourceHost': ids.get(initiator), 'destHost': ids.get(responder),
@@ -76,7 +83,9 @@ def dashboard():
         hosts = db.execute('SELECT COUNT(*) FROM hosts WHERE detector_flag=1').fetchone()[0]
         bounds = db.execute('SELECT MIN(first_ts), MAX(last_ts) FROM flows').fetchone()
         times = db.execute('SELECT CAST(t_min / 60 AS INTEGER) * 60 AS bucket, COUNT(*) AS n FROM detector_regions WHERE t_min IS NOT NULL GROUP BY bucket ORDER BY bucket').fetchall()
-        return {'totalAnomalies': total, 'highSeverityCount': None, 'hostsFlagged': hosts,
+        scores = [to_score(r[0]) for r in db.execute('SELECT confidence FROM detector_regions')]
+        high = sum(1 for s in scores if to_severity(s) >= 4)
+        return {'totalAnomalies': total, 'highSeverityCount': high, 'hostsFlagged': hosts,
                 'anomaliesOverTime': [{'time': iso(r['bucket']), 'count': r['n']} for r in times],
                 'captureStart': iso(bounds[0]), 'captureEnd': iso(bounds[1])}
 

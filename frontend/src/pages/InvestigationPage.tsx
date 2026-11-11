@@ -62,6 +62,7 @@ export default function InvestigationPage() {
     if (hosts.length === 0) return
     const controller = new AbortController()
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoadingConnections(true)
     setError(null)
     api.investigation(hosts, eventTime - windowSize, eventTime + windowSize, controller.signal)
